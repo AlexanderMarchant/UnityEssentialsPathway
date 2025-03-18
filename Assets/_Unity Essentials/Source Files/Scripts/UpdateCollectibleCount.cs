@@ -5,7 +5,10 @@ using System; // Required for Type handling
 public class UpdateCollectibleCount : MonoBehaviour
 {
     private TextMeshProUGUI collectibleText; // Reference to the TextMeshProUGUI component
+    private bool gameComplete = false;
+    public GameObject onCompletionEffect;
 
+    public AudioClip completionSoundClip;
     void Start()
     {
         collectibleText = GetComponent<TextMeshProUGUI>();
@@ -19,7 +22,29 @@ public class UpdateCollectibleCount : MonoBehaviour
 
     void Update()
     {
-        UpdateCollectibleDisplay();
+        if (this.gameComplete == false)
+        {
+            UpdateCollectibleDisplay();
+        }
+        else
+        {
+            GameObject player = GameObject.FindWithTag("Player");
+
+            if (player.transform.position.y != 10)
+            {
+                Rigidbody rb = player.GetComponent<Rigidbody>();
+                rb.useGravity = false;
+                rb.isKinematic = false;
+                if (player.transform.position.y < 10)
+                {
+                    player.transform.position += new Vector3(0, 10, 0) * Time.deltaTime;
+                }
+                else
+                {
+                    player.transform.position = new Vector3(player.transform.position.x, 10, player.transform.position.z);
+                }
+            }
+        }
     }
 
     private void UpdateCollectibleDisplay()
@@ -40,7 +65,23 @@ public class UpdateCollectibleCount : MonoBehaviour
             totalCollectibles += UnityEngine.Object.FindObjectsByType(collectible2DType, FindObjectsSortMode.None).Length;
         }
 
-        // Update the collectible count display
-        collectibleText.text = $"Collectibles remaining: {totalCollectibles}";
+        if (totalCollectibles == 0)
+        {
+            GameObject player = GameObject.FindWithTag("Player");
+            collectibleText.text = $"You got them all!";
+            Instantiate(onCompletionEffect, player.transform.position, player.transform.rotation);
+            this.gameComplete = true;
+            SoundFXManager.instance.playSoundFXClip(completionSoundClip, transform);
+        }
+        else
+        {
+            // Update the collectible count display
+            collectibleText.text = $"Collectibles remaining: {totalCollectibles}";
+        }
+    }
+
+    private void PlayCompletionSound()
+    {
+
     }
 }
