@@ -5,6 +5,7 @@ public class Collectible : MonoBehaviour
 {
     public float rotationSpeed;
     public GameObject onCollectEffect;
+    public AudioClip collectSoundClip;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -25,6 +26,7 @@ public class Collectible : MonoBehaviour
             // Destroy the collectible
             Destroy(gameObject);
             Instantiate(onCollectEffect, transform.position, transform.rotation);
+            SoundFXManager.instance.playSoundFXClip(collectSoundClip, transform);
         }
     }
 }
